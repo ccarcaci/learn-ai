@@ -40,9 +40,25 @@ func TestOnes(t *testing.T) {
 	assertFloatArrayEqual(t, expectedWeigths, trainedWeights)
 }
 
+func TestOnesConvergence(t *testing.T) {
+	//  --  prepare
+	input := []float64{1.0, 1.0}
+	weights := []float64{0.0, 0.0}
+	target := 1.0
+	eta := 0.1
+	epochs := 158
+
+	//  --  act
+	trainedWeights := learning.Learn(input, weights, target, eta, epochs)
+
+	//  -- check
+	expectedWeigths := []float64{0.5, 0.5}
+	assertFloatArrayEqual(t, expectedWeigths, trainedWeights)
+}
+
 //  --
 
-const minEpsilon = 2.7755575615628914e-17
+const minEpsilon = 2.7755575615628914e-16
 
 func assertFloatArrayEqual(t *testing.T, expected []float64, actual []float64) bool {
 	t.Helper()

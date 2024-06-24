@@ -25,5 +25,5 @@ sc:
 	make build
 	make unit-test
 
-unit-test:
-	go test -v ./internal/...
+unit-test-perceptron:
+	go test -v ./perceptron/...

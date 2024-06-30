@@ -1,6 +1,6 @@
 build:
 	mkdir -p bin
-	go build -o bin/learn-ai cmd/main.go
+	go build -o bin/leai main.go
 
 clean:
 	go clean
@@ -24,6 +24,10 @@ sc:
 	make fc
 	make build
 	make unit-test
+
+run-iris-dataset:
+	make build
+	./bin/leai iris-recognition --iris-dataset-path datasets/iris.data
 
 unit-test-perceptron:
 	go test -v ./perceptron/...

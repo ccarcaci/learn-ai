@@ -1,21 +1,72 @@
 package learning
 
-func Learn(input []float64, weights []float64, target float64, eta float64, epochs int) []float64 {
-	weightsLen := len(weights)
-	for i := 0; i < epochs; i++ {
-		output := Predict(input, weights)
-		for j := 0; j < weightsLen; j++ {
-			delta := eta * (target - output) * input[j]
-			weights[j] += delta
-		}
-	}
-	return weights
+type TrainSingleSample struct {
+	Inputs []float64
+	Target float64
 }
 
-func Predict(input []float64, weights []float64) float64 {
+type TrainSamples []TrainSingleSample
+
+type OutputFunc func(float64) float64
+
+type Perceptron struct {
+	Threshold         float64
+	Weights           []float64
+	EpochsErrorsCount []int
+}
+
+func Learn(eta float64, epochs int, samples TrainSamples, initialThreshold float64, initialWeights []float64, targets []float64, outputFunc OutputFunc) Perceptron {
+	samplesLen := len(samples)
+	weights := initialWeights
+	threshold := initialThreshold
+	epochsErrors := make([]int, 0)
+	for i := 0; i < epochs; i++ {
+		errors := 0
+		for j := 0; j < samplesLen; j++ {
+			output := Predict(samples[j].Inputs, weights, threshold, outputFunc)
+			target := targets[j]
+			update := eta * (target - output)
+			delta := scalarVectProduct(update, samples[j].Inputs)
+			weights = vectorsSum(weights, delta)
+			threshold += update
+			errors += learningErrorsCount(update)
+		}
+		epochsErrors = append(epochsErrors, errors)
+	}
+	return Perceptron{threshold, weights, epochsErrors}
+}
+
+func Predict(inputs []float64, weights []float64, threshold float64, outputFunc OutputFunc) float64 {
 	output := 0.0
 	for i, weight := range weights {
-		output += input[i] * weight
+		output += inputs[i] * weight
 	}
-	return output
+	return outputFunc(output)
+}
+
+//  --
+
+func scalarVectProduct(scalar float64, vector []float64) []float64 {
+	vectLen := len(vector)
+	result := make([]float64, vectLen)
+	for i := 0; i < vectLen; i++ {
+		result[i] = scalar * vector[i]
+	}
+	return result
+}
+
+func vectorsSum(first []float64, second []float64) []float64 {
+	vectLen := len(first)
+	result := make([]float64, vectLen)
+	for i := 0; i < vectLen; i++ {
+		result[i] = first[i] + second[i]
+	}
+	return result
+}
+
+func learningErrorsCount(update float64) int {
+	if update != 0 {
+		return 1
+	}
+	return 0
 }

@@ -39,7 +39,7 @@ func ReadIrisDataset(datasetPath string) ([]IrisData, error) {
 		}
 		irisDataset = append(irisDataset, irisData)
 	}
-	log.Printf(fmt.Sprintf("Dataset size: %d\n", len(irisDataset)))
+	log.Printf("Dataset size: %d\n", len(irisDataset))
 	return irisDataset, nil
 }
 

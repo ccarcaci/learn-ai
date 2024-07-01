@@ -1,7 +1,6 @@
 package learning_test
 
 import (
-	"math"
 	"testing"
 
 	"github.com/ccarcaci/learn-ai/perceptron/learning"
@@ -10,66 +9,96 @@ import (
 
 func TestZero(t *testing.T) {
 	//  --  prepare
-	input := []float64{0.0}
-	weights := []float64{0.0}
-	target := 0.0
+	trainingSample := []learning.TrainSingleSample{
+		{
+			Inputs: []float64{0.0},
+			Target: 0.0,
+		},
+	}
+	initialWeights := []float64{0.0}
+	initialThreshold := 0.0
 	eta := 0.0
 	epochs := 1
 
+	outputFunc := func(weightedSum float64) float64 {
+		if weightedSum > 0.0 {
+			return 1.0
+		}
+		return -1.0
+	}
+
 	//  --  act
-	trainedWeights := learning.Learn(input, weights, target, eta, epochs)
+	trainedPerceptron := learning.Learn(eta, epochs, trainingSample, initialThreshold, initialWeights, outputFunc)
 
 	//  --  check
-	expectedWeights := []float64{0.0}
-	assert.InDelta(t, expectedWeights[0], trainedWeights[0], math.SmallestNonzeroFloat64)
+	expectedPerceptron := learning.Perceptron{
+		Threshold:         0.0,
+		Weights:           []float64{0.0},
+		EpochsErrorsCount: []int{0},
+	}
+	assert.Equal(t, expectedPerceptron, trainedPerceptron)
 }
 
 func TestOnes(t *testing.T) {
 	//  --  prepare
-	input := []float64{1.0, 1.0}
-	weights := []float64{0.0, 0.0}
-	target := 1.0
+	trainingSample := []learning.TrainSingleSample{
+		{
+			Inputs: []float64{1.0, 1.0},
+			Target: 1.0,
+		},
+	}
+	initialWeights := []float64{0.0, 0.0}
+	initialThreshold := 0.5
 	eta := 0.1
 	epochs := 2
 
-	//  --  act
-	trainedWeights := learning.Learn(input, weights, target, eta, epochs)
+	outputFunc := func(weightedSum float64) float64 {
+		if weightedSum > 0.0 {
+			return 1.0
+		}
+		return -1.0
+	}
 
-	//  -- check
-	expectedWeigths := []float64{0.18, 0.18}
-	assertFloatArrayEqual(t, expectedWeigths, trainedWeights)
+	//  --  act
+	trainedPerceptron := learning.Learn(eta, epochs, trainingSample, initialThreshold, initialWeights, outputFunc)
+
+	//  --  check
+	expectedPerceptron := learning.Perceptron{
+		Threshold:         0.5,
+		Weights:           []float64{0.0, 0.0},
+		EpochsErrorsCount: []int{0, 0},
+	}
+	assert.Equal(t, expectedPerceptron, trainedPerceptron)
 }
 
 func TestOnesConvergence(t *testing.T) {
 	//  --  prepare
-	input := []float64{1.0, 1.0}
-	weights := []float64{0.0, 0.0}
-	target := 1.0
+	trainingSample := []learning.TrainSingleSample{
+		{
+			Inputs: []float64{1.0, 1.0},
+			Target: 1.0,
+		},
+	}
+	initialWeights := []float64{0.0, 0.0}
+	initialThreshold := -0.5
 	eta := 0.1
-	epochs := 158
+	epochs := 2
+
+	outputFunc := func(weightedSum float64) float64 {
+		if weightedSum > 0.0 {
+			return 1.0
+		}
+		return -1.0
+	}
 
 	//  --  act
-	trainedWeights := learning.Learn(input, weights, target, eta, epochs)
+	trainedPerceptron := learning.Learn(eta, epochs, trainingSample, initialThreshold, initialWeights, outputFunc)
 
-	//  -- check
-	expectedWeigths := []float64{0.5, 0.5}
-	assertFloatArrayEqual(t, expectedWeigths, trainedWeights)
-}
-
-//  --
-
-const minEpsilon = 2.7755575615628914e-16
-
-func assertFloatArrayEqual(t *testing.T, expected []float64, actual []float64) bool {
-	t.Helper()
-
-	lenExpected := len(expected)
-	lenActual := len(actual)
-	if len(expected) != len(actual) {
-		return assert.Fail(t, "expected len is %d, actual len is %d", lenExpected, lenActual)
+	//  --  check
+	expectedPerceptron := learning.Perceptron{
+		Threshold:         -0.3,
+		Weights:           []float64{0.2, 0.2},
+		EpochsErrorsCount: []int{1, 0},
 	}
-	for i := 0; i < len(expected); i++ {
-		assert.InDelta(t, expected[i], actual[i], minEpsilon)
-	}
-	return true
+	assert.Equal(t, expectedPerceptron, trainedPerceptron)
 }

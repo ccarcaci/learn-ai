@@ -15,18 +15,20 @@ type Perceptron struct {
 	EpochsErrorsCount []int
 }
 
-func Learn(eta float64, epochs int, samples TrainSamples, initialThreshold float64, initialWeights []float64, targets []float64, outputFunc OutputFunc) Perceptron {
+func Learn(eta float64, epochs int, samples TrainSamples, initialThreshold float64, initialWeights []float64, outputFunc OutputFunc) Perceptron {
 	samplesLen := len(samples)
 	weights := initialWeights
 	threshold := initialThreshold
+	
 	epochsErrors := make([]int, 0)
 	for i := 0; i < epochs; i++ {
 		errors := 0
 		for j := 0; j < samplesLen; j++ {
-			output := Predict(samples[j].Inputs, weights, threshold, outputFunc)
-			target := targets[j]
+			sample := samples[j]
+			output := Predict(sample.Inputs, weights, threshold, outputFunc)
+			target := sample.Target
 			update := eta * (target - output)
-			delta := scalarVectProduct(update, samples[j].Inputs)
+			delta := scalarVectProduct(update, sample.Inputs)
 			weights = vectorsSum(weights, delta)
 			threshold += update
 			errors += learningErrorsCount(update)
@@ -41,6 +43,7 @@ func Predict(inputs []float64, weights []float64, threshold float64, outputFunc 
 	for i, weight := range weights {
 		output += inputs[i] * weight
 	}
+	output += threshold
 	return outputFunc(output)
 }
 

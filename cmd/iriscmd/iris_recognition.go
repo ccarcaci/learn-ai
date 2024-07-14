@@ -1,7 +1,7 @@
-package iris
+package iriscmd
 
 import (
-	"github.com/ccarcaci/learn-ai/inputs/irisds"
+	"github.com/ccarcaci/learn-ai/inputs/irisinput"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +12,7 @@ var (
 		Short: "Iris Recognition",
 		Long:  "Iris Recognition",
 		Run: func(cmd *cobra.Command, args []string) {
-			irisds.ReadIrisDataset(IrisDatasetPath)
+			irisinput.ReadIrisDataset(IrisDatasetPath)
 		},
 	}
 )

@@ -1,4 +1,4 @@
-package irisds
+package irisinput
 
 import (
 	"encoding/csv"

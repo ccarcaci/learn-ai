@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ccarcaci/learn-ai/cmd/iris"
+	"github.com/ccarcaci/learn-ai/cmd/iriscmd"
 	"github.com/spf13/cobra"
 )
 
@@ -12,9 +12,6 @@ var RootCmd = &cobra.Command{
 	Use:   "leai",
 	Short: "Leai a powerful command line AI tool",
 	Long:  "Leai is a command line that provides a set of examples and AI tools",
-	//	Run: func(cmd *cobra.Command, args []string) {
-	//		cmd.Help()
-	//	},
 }
 
 func Execute() {
@@ -25,5 +22,5 @@ func Execute() {
 }
 
 func init() {
-	RootCmd.AddCommand(iris.IrisRecognitionCmd)
+	RootCmd.AddCommand(iriscmd.IrisRecognitionCmd)
 }

@@ -1,50 +1,37 @@
 package learning
 
-type TrainSingleSample struct {
-	Inputs []float64
-	Target float64
-}
+import "github.com/ccarcaci/learn-ai/perceptron"
 
-type TrainSamples []TrainSingleSample
-
-type OutputFunc func(float64) float64
-
-type Perceptron struct {
-	Threshold         float64
-	Weights           []float64
-	EpochsErrorsCount []int
-}
-
-func Learn(eta float64, epochs int, samples TrainSamples, initialThreshold float64, initialWeights []float64, outputFunc OutputFunc) Perceptron {
+func Train(eta float64, epochs int, samples perceptron.Samples, initialPerceptron perceptron.Perceptron) perceptron.Perceptron {
 	samplesLen := len(samples)
-	weights := initialWeights
-	threshold := initialThreshold
-	
+	trainingPerceptron := initialPerceptron
+
 	epochsErrors := make([]int, 0)
 	for i := 0; i < epochs; i++ {
 		errors := 0
 		for j := 0; j < samplesLen; j++ {
 			sample := samples[j]
-			output := Predict(sample.Inputs, weights, threshold, outputFunc)
+			output := Predict(sample.Inputs, trainingPerceptron)
 			target := sample.Target
 			update := eta * (target - output)
 			delta := scalarVectProduct(update, sample.Inputs)
-			weights = vectorsSum(weights, delta)
-			threshold += update
+			trainingPerceptron.Weights = vectorsSum(trainingPerceptron.Weights, delta)
+			trainingPerceptron.Threshold += update
 			errors += learningErrorsCount(update)
 		}
 		epochsErrors = append(epochsErrors, errors)
 	}
-	return Perceptron{threshold, weights, epochsErrors}
+	trainingPerceptron.EpochsErrorsCount = epochsErrors
+	return trainingPerceptron
 }
 
-func Predict(inputs []float64, weights []float64, threshold float64, outputFunc OutputFunc) float64 {
+func Predict(inputs []float64, perceptron perceptron.Perceptron) float64 {
 	output := 0.0
-	for i, weight := range weights {
+	for i, weight := range perceptron.Weights {
 		output += inputs[i] * weight
 	}
-	output += threshold
-	return outputFunc(output)
+	output += perceptron.Threshold
+	return perceptron.OutputFunc(output)
 }
 
 //  --

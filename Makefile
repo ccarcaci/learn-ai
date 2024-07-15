@@ -27,7 +27,7 @@ sc:
 
 run-iris-dataset:
 	make build
-	./bin/leai iris-recognition --iris-dataset-path datasets/iris.data
+	./bin/leai iris-recognition --training-ratio 0.8 --eta 0.05 --epochs 100 --iris-dataset-path datasets/iris.data
 
-unit-test-perceptron:
-	go test -v ./perceptron/...
+unit-test:
+	go test -v ./...

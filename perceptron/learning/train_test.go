@@ -3,13 +3,14 @@ package learning_test
 import (
 	"testing"
 
+	"github.com/ccarcaci/learn-ai/perceptron"
 	"github.com/ccarcaci/learn-ai/perceptron/learning"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestZero(t *testing.T) {
 	//  --  prepare
-	trainingSample := []learning.TrainSingleSample{
+	trainingSample := []perceptron.Sample{
 		{
 			Inputs: []float64{0.0},
 			Target: 0.0,
@@ -27,21 +28,28 @@ func TestZero(t *testing.T) {
 		return -1.0
 	}
 
+	initialPerceptron := perceptron.Perceptron{
+		Threshold:         initialThreshold,
+		Weights:           initialWeights,
+		OutputFunc:        outputFunc,
+		EpochsErrorsCount: []int{0},
+	}
+
 	//  --  act
-	trainedPerceptron := learning.Learn(eta, epochs, trainingSample, initialThreshold, initialWeights, outputFunc)
+	trainedPerceptron := learning.Train(eta, epochs, trainingSample, initialPerceptron)
 
 	//  --  check
-	expectedPerceptron := learning.Perceptron{
+	expectedPerceptron := perceptron.Perceptron{
 		Threshold:         0.0,
 		Weights:           []float64{0.0},
 		EpochsErrorsCount: []int{0},
 	}
-	assert.Equal(t, expectedPerceptron, trainedPerceptron)
+	perceptronEqual(t, expectedPerceptron, trainedPerceptron)
 }
 
 func TestOnes(t *testing.T) {
 	//  --  prepare
-	trainingSample := []learning.TrainSingleSample{
+	trainingSample := []perceptron.Sample{
 		{
 			Inputs: []float64{1.0, 1.0},
 			Target: 1.0,
@@ -59,21 +67,28 @@ func TestOnes(t *testing.T) {
 		return -1.0
 	}
 
+	initialPerceptron := perceptron.Perceptron{
+		Threshold:         initialThreshold,
+		Weights:           initialWeights,
+		OutputFunc:        outputFunc,
+		EpochsErrorsCount: []int{0},
+	}
+
 	//  --  act
-	trainedPerceptron := learning.Learn(eta, epochs, trainingSample, initialThreshold, initialWeights, outputFunc)
+	trainedPerceptron := learning.Train(eta, epochs, trainingSample, initialPerceptron)
 
 	//  --  check
-	expectedPerceptron := learning.Perceptron{
+	expectedPerceptron := perceptron.Perceptron{
 		Threshold:         0.5,
 		Weights:           []float64{0.0, 0.0},
 		EpochsErrorsCount: []int{0, 0},
 	}
-	assert.Equal(t, expectedPerceptron, trainedPerceptron)
+	perceptronEqual(t, expectedPerceptron, trainedPerceptron)
 }
 
 func TestOnesConvergence(t *testing.T) {
 	//  --  prepare
-	trainingSample := []learning.TrainSingleSample{
+	trainingSample := []perceptron.Sample{
 		{
 			Inputs: []float64{1.0, 1.0},
 			Target: 1.0,
@@ -91,14 +106,29 @@ func TestOnesConvergence(t *testing.T) {
 		return -1.0
 	}
 
+	initialPerceptron := perceptron.Perceptron{
+		Threshold:         initialThreshold,
+		Weights:           initialWeights,
+		OutputFunc:        outputFunc,
+		EpochsErrorsCount: []int{0},
+	}
+
 	//  --  act
-	trainedPerceptron := learning.Learn(eta, epochs, trainingSample, initialThreshold, initialWeights, outputFunc)
+	trainedPerceptron := learning.Train(eta, epochs, trainingSample, initialPerceptron)
 
 	//  --  check
-	expectedPerceptron := learning.Perceptron{
+	expectedPerceptron := perceptron.Perceptron{
 		Threshold:         -0.3,
 		Weights:           []float64{0.2, 0.2},
 		EpochsErrorsCount: []int{1, 0},
 	}
-	assert.Equal(t, expectedPerceptron, trainedPerceptron)
+	perceptronEqual(t, expectedPerceptron, trainedPerceptron)
+}
+
+//  --
+
+func perceptronEqual(t *testing.T, expected perceptron.Perceptron, trained perceptron.Perceptron) {
+	assert.Equal(t, expected.Threshold, trained.Threshold)
+	assert.Equal(t, expected.Weights, trained.Weights)
+	assert.Equal(t, expected.EpochsErrorsCount, trained.EpochsErrorsCount)
 }

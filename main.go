@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	if err :=cmd.RootCmd.Execute(); err != nil {
+	if err := cmd.RootCmd.Execute(); err != nil {
 		log.Fatalf("cmd.RootCmd.Execute(): %v", err)
 	}
 }

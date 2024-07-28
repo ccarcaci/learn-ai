@@ -12,7 +12,7 @@ import (
 	"github.com/ccarcaci/learn-ai/perceptron/split"
 )
 
-func TrainAndTest(trainRatio float64, eta float64, epochs int, datasetPath string) {
+func TrainAndTest(trainRatio float64, eta float64, epochs int, datasetPath string, trainingType string, activationType string) {
 	irisDataset, err := irisinput.ReadIrisDataset(datasetPath)
 	if err != nil {
 		log.Fatalf("inputs.ReadIrisDataset(): %v", err)
@@ -28,9 +28,15 @@ func TrainAndTest(trainRatio float64, eta float64, epochs int, datasetPath strin
 	initialPerceptron := perceptron.Perceptron{
 		Threshold:  initialThreshold,
 		Weights:    initialWeights,
-		OutputFunc: outputFunc,
+		OutputFunc: perceptron.Step,
 	}
-	trainedPerceptron := learning.Train(eta, epochs, split.TrainingSamples, initialPerceptron)
+
+	activationFunc := perceptron.Step
+	if activationType == "adaline" {
+		activationFunc = perceptron.Linear
+	}
+
+	trainedPerceptron := learning.Train(eta, epochs, trainingType, split.TrainingSamples, initialPerceptron, activationFunc)
 	predict.Classify(split.TestingSamples, trainedPerceptron)
 }
 
@@ -41,11 +47,4 @@ func CreateRandom() func() float64 {
 	return func() float64 {
 		return rng.Float64()
 	}
-}
-
-func outputFunc(weightedSum float64) float64 {
-	if weightedSum > 0.0 {
-		return 1.0
-	}
-	return -1.0
 }

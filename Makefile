@@ -25,9 +25,45 @@ sc:
 	make build
 	make unit-test
 
-run-iris-dataset:
+run-iris-dataset-batch-perceptron:
 	make build
-	./bin/leai iris-recognition --training-ratio 0.8 --eta 0.05 --epochs 100 --iris-dataset-path datasets/iris.data
+	./bin/leai iris-recognition \
+		--iris-dataset-path datasets/iris.data \
+		--training-type batch \
+		--activation-type perceptron \
+		--eta 0.01 \
+		--epochs 100 \
+		--training-ratio 0.8
+
+run-iris-dataset-online-perceptron:
+	make build
+	./bin/leai iris-recognition \
+		--iris-dataset-path datasets/iris.data \
+		--training-type online \
+		--activation-type perceptron \
+		--eta 0.01 \
+		--epochs 100 \
+		--training-ratio 0.8
+
+run-iris-dataset-batch-adaline:
+	make build
+	./bin/leai iris-recognition \
+		--iris-dataset-path datasets/iris.data \
+		--training-type batch \
+		--activation-type adaline \
+		--eta 0.01 \
+		--epochs 100 \
+		--training-ratio 0.8
+
+run-iris-dataset-online-adaline:
+	make build
+	./bin/leai iris-recognition \
+		--iris-dataset-path datasets/iris.data \
+		--training-type online \
+		--activation-type adaline \
+		--eta 0.0001 \
+		--epochs 100 \
+		--training-ratio 0.8
 
 unit-test:
 	go test -v ./...

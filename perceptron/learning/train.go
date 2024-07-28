@@ -2,26 +2,18 @@ package learning
 
 import "github.com/ccarcaci/learn-ai/perceptron"
 
-func Train(eta float64, epochs int, samples perceptron.Samples, initialPerceptron perceptron.Perceptron) perceptron.Perceptron {
-	samplesLen := len(samples)
+func Train(eta float64, epochs int, trainingType string, samples perceptron.Samples, initialPerceptron perceptron.Perceptron, activationFunc func(float64) float64) perceptron.Perceptron {
 	trainingPerceptron := initialPerceptron
 
-	epochsErrors := make([]int, 0)
 	for i := 0; i < epochs; i++ {
-		errors := 0
-		for j := 0; j < samplesLen; j++ {
-			sample := samples[j]
-			output := Predict(sample.Inputs, trainingPerceptron)
-			target := sample.Target
-			update := eta * (target - output)
-			delta := scalarVectProduct(update, sample.Inputs)
-			trainingPerceptron.Weights = vectorsSum(trainingPerceptron.Weights, delta)
-			trainingPerceptron.Threshold += update
-			errors += learningErrorsCount(update)
+		if trainingType == "online" {
+			trainingPerceptron = onlineLearning(eta, samples, trainingPerceptron, activationFunc)
+			continue
 		}
-		epochsErrors = append(epochsErrors, errors)
+		if trainingType == "batch" {
+			trainingPerceptron = batchLearning(eta, samples, trainingPerceptron, activationFunc)
+		}
 	}
-	trainingPerceptron.EpochsErrorsCount = epochsErrors
 	return trainingPerceptron
 }
 
@@ -36,27 +28,47 @@ func Predict(inputs []float64, perceptron perceptron.Perceptron) float64 {
 
 //  --
 
-func scalarVectProduct(scalar float64, vector []float64) []float64 {
-	vectLen := len(vector)
-	result := make([]float64, vectLen)
-	for i := 0; i < vectLen; i++ {
-		result[i] = scalar * vector[i]
+func batchLearning(eta float64, samples perceptron.Samples, perceptron perceptron.Perceptron, activationFunc func(float64) float64) perceptron.Perceptron {
+	partials := make([]float64, len(perceptron.Weights))
+	thresholdErrFeed := 0.0
+	for _, sample := range samples {
+		sum := perceptron.Threshold
+		for i, input := range sample.Inputs {
+			sum += input * perceptron.Weights[i]
+		}
+
+		activation := activationFunc(sum)
+		errFeed := sample.Target - activation
+		thresholdErrFeed += errFeed
+
+		for i, input := range sample.Inputs {
+			partials[i] = errFeed * input
+		}
 	}
-	return result
+
+	for i, partial := range partials {
+		perceptron.Weights[i] += eta * partial
+	}
+	perceptron.Threshold += eta * thresholdErrFeed
+
+	return perceptron
 }
 
-func vectorsSum(first []float64, second []float64) []float64 {
-	vectLen := len(first)
-	result := make([]float64, vectLen)
-	for i := 0; i < vectLen; i++ {
-		result[i] = first[i] + second[i]
-	}
-	return result
-}
+func onlineLearning(eta float64, samples perceptron.Samples, perceptron perceptron.Perceptron, activationFunc func(float64) float64) perceptron.Perceptron {
+	for _, sample := range samples {
+		sum := perceptron.Threshold
+		for i, input := range sample.Inputs {
+			sum += input * perceptron.Weights[i]
+		}
 
-func learningErrorsCount(update float64) int {
-	if update != 0 {
-		return 1
+		activation := activationFunc(sum)
+		errFeed := eta * (sample.Target - activation)
+
+		for i, input := range sample.Inputs {
+			perceptron.Weights[i] += errFeed * input
+		}
+		perceptron.Threshold += errFeed
 	}
-	return 0
+
+	return perceptron
 }

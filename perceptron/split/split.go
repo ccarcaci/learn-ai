@@ -59,8 +59,8 @@ func confirmTraining(randomGenerator GenerateRandom) SetName {
 }
 
 func getRatio(trainingLen int, testingLen int) float64 {
-	if testingLen + trainingLen == 0 {
+	if testingLen+trainingLen == 0 {
 		return 1.0
 	}
-	return float64(trainingLen) / float64(trainingLen + testingLen)
+	return float64(trainingLen) / float64(trainingLen+testingLen)
 }

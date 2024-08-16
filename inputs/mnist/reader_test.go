@@ -107,12 +107,12 @@ func printNumber(t *testing.T, cols int32, rows int32, data []uint8) {
 	}
 }
 
-const ramp = "@#+=."
+const ramp = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'."
 
 func grayScaleToAscii(grayScale uint8) string {
 	if grayScale >= 255 {
 		return "."
 	}
-	index := grayScale / 51
+	index := uint8(float64(grayScale) / 3.6956)
 	return string(ramp[index])
 }

@@ -25,6 +25,9 @@ sc:
 	make build
 	make unit-test
 
+read-mnist-image-discovery:
+	go test -timeout 30s -v -run ^TestDiscoveryReadTestingImages github.com/ccarcaci/learn-ai/inputs/mnist
+
 run-iris-dataset-batch-perceptron:
 	make build
 	./bin/leai iris-recognition \

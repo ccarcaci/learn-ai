@@ -20,13 +20,13 @@ type fileContent struct {
 func TestDiscoveryReadTestingLabels(t *testing.T) {
 	testingLabelsPath := "../../datasets/t10k-labels-idx1-ubyte"
 	file, err := os.Open(testingLabelsPath)
+	require.NoError(t, err)
 	defer func() {
 		err := file.Close()
 		if err != nil {
 			os.Exit(-1)
 		}
 	}()
-	require.NoError(t, err)
 
 	//  --
 	magicNumber := int32(0)
@@ -89,6 +89,11 @@ func TestDiscoveryReadTestingImages(t *testing.T) {
 	err = binary.Read(file, binary.BigEndian, &data)
 	require.NoError(t, err)
 	printNumber(t, rows, cols, data)
+
+	//  --
+	err = binary.Read(file, binary.BigEndian, &data)
+	require.NoError(t, err)
+	printNumber(t, rows, cols, data)
 }
 
 //  --
@@ -107,12 +112,13 @@ func printNumber(t *testing.T, cols int32, rows int32, data []uint8) {
 	}
 }
 
-const ramp = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'."
+const ramp = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`' "
 
 func grayScaleToAscii(grayScale uint8) string {
 	if grayScale >= 255 {
 		return "."
 	}
-	index := uint8(float64(grayScale) / 3.6956)
+	revIndex := uint8(float64(grayScale) / 3.6956)
+	index := uint8(len(ramp)) - revIndex - 1
 	return string(ramp[index])
 }

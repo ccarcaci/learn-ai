@@ -1,3 +1,6 @@
+init:
+	go mod init leai
+
 build:
 	mkdir -p bin
 	go build -o bin/leai main.go
